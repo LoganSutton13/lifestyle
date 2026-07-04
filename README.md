@@ -1,4 +1,4 @@
-# Elevate Fitness
+# Lifestyle
 
 A mobile-first health and fitness coaching Progressive Web App (PWA) with client, coach, and admin roles. Clients track meal plans, daily checklists, body measurements, and profile settings. Coaches manage associated clients. Admins manage accounts.
 

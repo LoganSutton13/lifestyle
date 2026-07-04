@@ -28,7 +28,7 @@ export function LoginPage() {
   return (
     <div className="mx-auto flex min-h-screen max-w-client flex-col justify-center px-4 py-8">
       <div className="mb-8 text-center">
-        <h1 className="text-3xl font-bold text-text">Elevate Fitness</h1>
+        <h1 className="text-3xl font-bold text-text">Lifestyle</h1>
         <p className="mt-2 text-textMuted">Sign in to your account</p>
       </div>
 

@@ -12,8 +12,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['icons/favicon.svg', 'icons/apple-touch-icon.png'],
       manifest: {
-        name: 'Elevate Fitness',
-        short_name: 'Elevate',
+        name: 'Lifestyle',
+        short_name: 'Lifestyle',
         description: 'Fitness coaching, meal plans, habits, and body data tracking.',
         start_url: '/',
         scope: '/',
