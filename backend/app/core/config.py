@@ -26,23 +26,28 @@ class Settings(BaseSettings):
     @model_validator(mode="after")
     def validate_database_url(self) -> "Settings":
         parsed = urlparse(self.DATABASE_URL)
-        if parsed.scheme not in {"postgresql", "postgresql+asyncpg", "sqlite+aiosqlite"}:
+        if parsed.scheme == "sqlite+aiosqlite":
+            return self
+        if parsed.scheme not in {"postgresql", "postgres", "postgresql+asyncpg"}:
             msg = "DATABASE_URL must use postgresql+asyncpg:// or sqlite+aiosqlite://"
             raise ValueError(msg)
-        if parsed.scheme.startswith("postgresql") and not parsed.username:
+        if not parsed.username:
             msg = (
                 "DATABASE_URL is missing username/password. "
                 "Use: postgresql+asyncpg://postgres:YOUR_PASSWORD@localhost:5432/fitness_app_dev"
             )
             raise ValueError(msg)
-        if parsed.scheme.startswith("postgresql") and parsed.query:
+        if parsed.scheme in {"postgresql", "postgres"}:
+            parsed = parsed._replace(scheme="postgresql+asyncpg")
+        if parsed.query:
             params = parse_qs(parsed.query, keep_blank_values=True)
             params.pop("channel_binding", None)
             if "sslmode" in params:
                 params["ssl"] = params.pop("sslmode")
             flat = {key: values[0] for key, values in params.items() if values}
             query = urlencode(flat)
-            self.DATABASE_URL = urlunparse(parsed._replace(query=query))
+            parsed = parsed._replace(query=query)
+        self.DATABASE_URL = urlunparse(parsed)
         return self
 
     @property
