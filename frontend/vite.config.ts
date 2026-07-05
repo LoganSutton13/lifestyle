@@ -41,6 +41,7 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        globIgnores: ['**/avatars/**'],
         navigateFallback: '/index.html',
         runtimeCaching: [],
       },
