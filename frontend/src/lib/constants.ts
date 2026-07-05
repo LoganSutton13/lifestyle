@@ -23,20 +23,35 @@ export interface UserWithCreated extends User {
 
 export const AVATAR_KEYS = [
   'avocado',
-  'blueberry',
-  'strawberry',
   'banana',
-  'broccoli',
   'carrot',
-  'apple',
+  'guava',
+  'kiwi',
+  'lemon',
+  'lettuce',
   'orange',
-  'pear',
-  'oatmeal',
-  'yogurt',
-  'sweet-potato',
+  'pepper',
+  'pineapple',
+  'redpepper',
+  'watermelon',
 ] as const
 
 export type AvatarKey = (typeof AVATAR_KEYS)[number]
+
+const AVATAR_FILES: Record<AvatarKey, string> = {
+  avocado: 'cute_avocado',
+  banana: 'cute_banana',
+  carrot: 'cute_carrot',
+  guava: 'cute_guava',
+  kiwi: 'cute_kiwi',
+  lemon: 'cute_lemon',
+  lettuce: 'cute_lettuce',
+  orange: 'cute_orange',
+  pepper: 'cute_pepper',
+  pineapple: 'cute_pineapple',
+  redpepper: 'cute_red_pepper',
+  watermelon: 'cuter_watermelon',
+}
 
 export const MEAL_CATEGORIES = [
   { key: 'all', label: 'All' },
@@ -65,7 +80,8 @@ export const DEFAULT_PAGE_SIZE = 10
 export const COACH_PAGE_SIZE = 20
 
 export function avatarUrl(key: string): string {
-  return `/avatars/${key}.svg`
+  const file = AVATAR_FILES[key as AvatarKey] ?? key
+  return `/avatars/${file}.svg`
 }
 
 export function getDefaultRedirect(role: UserRole): string {
