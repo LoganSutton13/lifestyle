@@ -18,6 +18,16 @@ class CoachClientSummary(BaseModel):
     model_config = {"populate_by_name": True}
 
 
+class CoachClientProfile(BaseModel):
+    id: UUID
+    username: str
+    first_name: str = Field(alias="firstName")
+    last_name: str = Field(alias="lastName")
+    timezone: str
+
+    model_config = {"populate_by_name": True}
+
+
 class CoachClientListResponse(BaseModel):
     items: list[CoachClientSummary]
     page: int

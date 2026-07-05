@@ -37,7 +37,9 @@ async def get_measurements(
     unit_key: str | None = Query(default=None, alias="unitKey"),
 ) -> MeasurementGraphResponse:
     service = MeasurementService(db)
-    return await service.get_graph(current_user.id, type_key, start_date, end_date, unit_key)
+    return await service.get_graph(
+        current_user.id, type_key, start_date, end_date, unit_key, current_user.timezone
+    )
 
 
 @router.post("/measurements", response_model=MeasurementPoint, status_code=201)

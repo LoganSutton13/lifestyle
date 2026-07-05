@@ -5,14 +5,17 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.api.error_handlers import NotFoundError
 from app.api.deps import assert_coach_has_client, require_roles
 from app.db.models.user import User
 from app.db.session import get_db
+from app.repositories.users import UserRepository
 from app.schemas.checklist import ChecklistHistoryResponse, DailyNotesListResponse
 from app.schemas.coach import (
     AddClientRequest,
     ClientSearchResponse,
     CoachClientListResponse,
+    CoachClientProfile,
     CoachTaskListResponse,
     TaskCreateRequest,
     TaskUpdateRequest,
@@ -58,6 +61,17 @@ async def add_client(
 ) -> None:
     service = CoachService(db)
     await service.add_client(current_user.id, data)
+
+
+@router.get("/clients/{client_id}", response_model=CoachClientProfile)
+async def get_client(
+    client_id: UUID,
+    current_user: Annotated[User, Depends(require_roles("coach"))],
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> CoachClientProfile:
+    await assert_coach_has_client(db, current_user.id, client_id)
+    service = CoachService(db)
+    return await service.get_client(client_id)
 
 
 @router.delete("/clients/{client_id}", status_code=204)
@@ -192,8 +206,14 @@ async def get_client_measurements(
     unit_key: str | None = Query(default=None, alias="unitKey"),
 ) -> MeasurementGraphResponse:
     await assert_coach_has_client(db, current_user.id, client_id)
+    users = UserRepository(db)
+    client = await users.get_by_id(client_id)
+    if not client:
+        raise NotFoundError("Client not found")
     service = MeasurementService(db)
-    return await service.get_graph(client_id, type_key, start_date, end_date, unit_key)
+    return await service.get_graph(
+        client_id, type_key, start_date, end_date, unit_key, client.timezone
+    )
 
 
 @router.get("/clients/{client_id}/checklist-history", response_model=ChecklistHistoryResponse)

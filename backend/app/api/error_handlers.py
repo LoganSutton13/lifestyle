@@ -60,13 +60,21 @@ def register_error_handlers(app: FastAPI) -> None:
 
     @app.exception_handler(RequestValidationError)
     async def validation_exception_handler(_request: Request, exc: RequestValidationError) -> ORJSONResponse:
+        errors = []
+        for error in exc.errors():
+            sanitized = {key: value for key, value in error.items() if key != "ctx"}
+            if "ctx" in error:
+                ctx = error["ctx"]
+                if "error" in ctx:
+                    sanitized["message"] = str(ctx["error"])
+            errors.append(sanitized)
         return ORJSONResponse(
             status_code=422,
             content=ErrorResponse(
                 error=AppError(
                     code="VALIDATION_ERROR",
                     message="Request validation failed",
-                    details={"errors": exc.errors()},
+                    details={"errors": errors},
                 )
             ).model_dump(),
         )

@@ -7,6 +7,7 @@ import { Input } from '../../components/ui/Input'
 import { Modal } from '../../components/ui/Modal'
 import { Select } from '../../components/ui/Select'
 import { getDefaultUnitForType, getUnitsForType } from '../../lib/units'
+import { formatDateTimeLocalInTimezone } from '../../lib/date'
 import type { MeasurementType } from './api'
 
 const schema = z.object({
@@ -23,6 +24,7 @@ export interface AddMeasurementModalProps {
   onClose: () => void
   types: MeasurementType[]
   defaultTypeKey: string
+  timezone: string
   saving?: boolean
   onSubmit: (values: AddMeasurementForm) => void
 }
@@ -32,6 +34,7 @@ export function AddMeasurementModal({
   onClose,
   types,
   defaultTypeKey,
+  timezone,
   saving,
   onSubmit,
 }: AddMeasurementModalProps) {
@@ -47,7 +50,7 @@ export function AddMeasurementModal({
     defaultValues: {
       typeKey: defaultTypeKey,
       unitKey: getDefaultUnitForType(defaultTypeKey),
-      recordedAt: new Date().toISOString().slice(0, 16),
+      recordedAt: formatDateTimeLocalInTimezone(new Date(), timezone),
     },
   })
 
@@ -58,10 +61,10 @@ export function AddMeasurementModal({
       reset({
         typeKey: defaultTypeKey,
         unitKey: getDefaultUnitForType(defaultTypeKey),
-        recordedAt: new Date().toISOString().slice(0, 16),
+        recordedAt: formatDateTimeLocalInTimezone(new Date(), timezone),
       })
     }
-  }, [open, defaultTypeKey, reset])
+  }, [open, defaultTypeKey, timezone, reset])
 
   useEffect(() => {
     setValue('unitKey', getDefaultUnitForType(typeKey))

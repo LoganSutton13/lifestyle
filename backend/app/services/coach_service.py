@@ -17,6 +17,7 @@ from app.schemas.coach import (
     ClientSearchResponse,
     ClientSearchResult,
     CoachClientListResponse,
+    CoachClientProfile,
     CoachClientSummary,
 )
 from app.services.unit_conversion import from_base_value
@@ -33,6 +34,18 @@ class CoachService:
     async def assert_coach_has_client(self, coach_id: UUID, client_id: UUID) -> None:
         if not await self.coach_clients.exists(coach_id, client_id):
             raise ForbiddenError("Client is not associated with this coach")
+
+    async def get_client(self, client_id: UUID) -> CoachClientProfile:
+        user = await self.users.get_by_id(client_id)
+        if not user or user.role != "client":
+            raise NotFoundError("Client not found")
+        return CoachClientProfile(
+            id=user.id,
+            username=user.username,
+            firstName=user.first_name,
+            lastName=user.last_name,
+            timezone=user.timezone,
+        )
 
     async def list_clients(
         self, coach_id: UUID, search: str | None, page: int, page_size: int

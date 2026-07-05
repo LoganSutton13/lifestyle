@@ -1,10 +1,11 @@
-from datetime import UTC, date, datetime, timedelta
+from datetime import UTC, date
 from decimal import Decimal
 from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.error_handlers import NotFoundError, ValidationError
+from app.core.timezone import date_range_to_utc_bounds, default_date_range
 from app.db.models.measurement_record import MeasurementRecord
 from app.repositories.measurements import MeasurementRepository
 from app.schemas.measurements import (
@@ -31,10 +32,8 @@ class MeasurementService:
             items=[MeasurementTypeResponse(key=t.key, displayName=t.display_name) for t in types]
         )
 
-    def _default_date_range(self) -> tuple[date, date]:
-        end = datetime.now(UTC).date()
-        start = end - timedelta(days=30)
-        return start, end
+    def _default_date_range(self, timezone: str) -> tuple[date, date]:
+        return default_date_range(timezone, days=30)
 
     def _validate_range(self, start: date, end: date) -> None:
         if (end - start).days > MAX_RANGE_DAYS:
@@ -47,20 +46,20 @@ class MeasurementService:
         start_date: date | None,
         end_date: date | None,
         unit_key: str | None,
+        timezone: str,
     ) -> MeasurementGraphResponse:
         mtype = await self.measurements.get_type(type_key)
         if not mtype:
             raise NotFoundError("Measurement type not found")
         start, end = start_date, end_date
         if not start or not end:
-            start, end = self._default_date_range()
+            start, end = self._default_date_range(timezone)
         self._validate_range(start, end)
         unit_key = unit_key or mtype.default_unit_key
         unit = await self.measurements.get_unit(unit_key)
         if not unit:
             raise ValidationError("Invalid unit")
-        start_dt = datetime.combine(start, datetime.min.time(), tzinfo=UTC)
-        end_dt = datetime.combine(end, datetime.max.time(), tzinfo=UTC)
+        start_dt, end_dt = date_range_to_utc_bounds(start, end, timezone)
         records = await self.measurements.list_records(client_id, type_key, start_dt, end_dt)
         points = [
             MeasurementPoint(

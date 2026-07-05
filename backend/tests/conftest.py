@@ -79,6 +79,7 @@ async def create_user(
     username: str,
     role: str,
     password: str = "SecurePass123!",
+    timezone: str = "America/Los_Angeles",
 ) -> User:
     user = User(
         username=username,
@@ -86,6 +87,7 @@ async def create_user(
         last_name="User",
         password_hash=hash_password(password),
         role=role,
+        timezone=timezone,
     )
     db.add(user)
     await db.flush()

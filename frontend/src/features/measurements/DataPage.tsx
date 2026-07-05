@@ -4,9 +4,15 @@ import { Plus } from 'lucide-react'
 import { Spinner } from '../../components/ui/Spinner'
 import { useToast } from '../../components/ui/Toast'
 import { MAX_MEASUREMENT_RANGE_DAYS, RANGE_PRESETS, type RangePresetKey } from '../../lib/constants'
-import { daysBetween, formatDateTimeForApi, getRangeFromPreset } from '../../lib/date'
+import {
+  daysBetween,
+  getBrowserTimezone,
+  getRangeFromPreset,
+  parseDateTimeLocalInTimezone,
+} from '../../lib/date'
 import { getDefaultUnitForType } from '../../lib/units'
 import { getErrorMessage } from '../../lib/errors'
+import { useAuthUser } from '../auth/hooks'
 import * as measurementsApi from './api'
 import { AddMeasurementModal, type AddMeasurementForm } from './AddMeasurementModal'
 import { MeasurementChart } from './MeasurementChart'
@@ -14,6 +20,8 @@ import { MeasurementTypeTabs } from './MeasurementTypeTabs'
 import { RangeFilter } from './RangeFilter'
 
 export function DataPage() {
+  const user = useAuthUser()
+  const timezone = user?.timezone ?? getBrowserTimezone()
   const [rangePreset, setRangePreset] = useState<RangePresetKey>('1M')
   const [typeKey, setTypeKey] = useState<string>('body_weight')
   const [modalOpen, setModalOpen] = useState(false)
@@ -34,8 +42,8 @@ export function DataPage() {
 
   const range = useMemo(() => {
     const preset = RANGE_PRESETS.find((item) => item.key === rangePreset)
-    return getRangeFromPreset(preset?.months ?? 1)
-  }, [rangePreset])
+    return getRangeFromPreset(preset?.months ?? 1, timezone)
+  }, [rangePreset, timezone])
 
   const unitKey = getDefaultUnitForType(activeTypeKey)
 
@@ -62,7 +70,7 @@ export function DataPage() {
         typeKey: values.typeKey,
         value: values.value,
         unitKey: values.unitKey,
-        recordedAt: formatDateTimeForApi(new Date(values.recordedAt)),
+        recordedAt: parseDateTimeLocalInTimezone(values.recordedAt, timezone),
       })
     },
     onSuccess: async () => {
@@ -109,7 +117,7 @@ export function DataPage() {
         </p>
       ) : null}
 
-      {graphQuery.isSuccess ? <MeasurementChart data={graphQuery.data} /> : null}
+      {graphQuery.isSuccess ? <MeasurementChart data={graphQuery.data} timezone={timezone} /> : null}
 
       {typesQuery.isSuccess ? (
         <AddMeasurementModal
@@ -117,6 +125,7 @@ export function DataPage() {
           onClose={() => setModalOpen(false)}
           types={typesQuery.data.items}
           defaultTypeKey={activeTypeKey}
+          timezone={timezone}
           saving={createMutation.isPending}
           onSubmit={(values) => createMutation.mutate(values)}
         />

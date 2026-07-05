@@ -3,10 +3,12 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { Card } from '../../components/ui/Card'
 import { Input } from '../../components/ui/Input'
+import { Select } from '../../components/ui/Select'
 import { Button } from '../../components/ui/Button'
 import { useToast } from '../../components/ui/Toast'
 import { avatarUrl } from '../../lib/constants'
 import { getBrowserTimezone } from '../../lib/date'
+import { getTimezoneOptions } from '../../lib/timezones'
 import { getErrorMessage } from '../../lib/errors'
 import { changePassword, deleteAccount, updateProfile } from '../auth/api'
 import { AUTH_QUERY_KEY, useAuthUser, useLogout } from '../auth/hooks'
@@ -32,6 +34,7 @@ export function ProfilePage() {
     register,
     handleSubmit,
     reset,
+    watch,
     formState: { isSubmitting },
   } = useForm<ProfileForm>()
 
@@ -61,6 +64,9 @@ export function ProfilePage() {
   if (!user) {
     return null
   }
+
+  const timezoneValue = watch('timezone')
+  const timezoneOptions = getTimezoneOptions(timezoneValue || user.timezone)
 
   return (
     <div className="space-y-6">
@@ -92,7 +98,11 @@ export function ProfilePage() {
           <Input label="Username" {...register('username')} />
           <Input label="First name" {...register('firstName')} />
           <Input label="Last name" {...register('lastName')} />
-          <Input label="Timezone" {...register('timezone')} />
+          <Select
+            label="Timezone"
+            options={timezoneOptions}
+            {...register('timezone')}
+          />
           <Button type="submit" loading={isSubmitting || profileMutation.isPending}>
             Save profile
           </Button>

@@ -13,6 +13,14 @@ export interface CoachClientSummary {
   todayTotalTasks: number
 }
 
+export interface CoachClientProfile {
+  id: string
+  username: string
+  firstName: string
+  lastName: string
+  timezone: string
+}
+
 export interface CoachClientListResponse {
   items: CoachClientSummary[]
   page: number
@@ -58,6 +66,10 @@ export interface DailyNoteItem {
   date: string
   body: string
   updatedAt: string
+}
+
+export function fetchCoachClient(clientId: string): Promise<CoachClientProfile> {
+  return apiRequest<CoachClientProfile>(`/api/coach/clients/${clientId}`)
 }
 
 export function fetchCoachClients(params: {

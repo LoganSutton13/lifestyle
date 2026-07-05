@@ -4,6 +4,8 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 
+from app.core.timezone import validate_timezone
+
 USERNAME_PATTERN = re.compile(r"^[a-zA-Z0-9_.-]{3,30}$")
 
 
@@ -34,6 +36,11 @@ class RegisterRequest(BaseModel):
     timezone: str = "America/Los_Angeles"
 
     model_config = {"populate_by_name": True}
+
+    @field_validator("timezone")
+    @classmethod
+    def validate_timezone_field(cls, value: str) -> str:
+        return validate_timezone(value)
 
     @field_validator("username")
     @classmethod
@@ -85,6 +92,13 @@ class ProfileUpdateRequest(BaseModel):
     avatar_key: str | None = Field(default=None, alias="avatarKey")
 
     model_config = {"populate_by_name": True}
+
+    @field_validator("timezone")
+    @classmethod
+    def validate_timezone_field(cls, value: str | None) -> str | None:
+        if value is None:
+            return value
+        return validate_timezone(value)
 
 
 class ChangePasswordRequest(BaseModel):

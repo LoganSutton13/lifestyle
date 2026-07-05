@@ -7,17 +7,18 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
-import { formatDisplayDate } from '../../lib/date'
+import { formatDisplayDateInTimezone } from '../../lib/date'
 import type { MeasurementGraphResponse } from './api'
 
 export interface MeasurementChartProps {
   data: MeasurementGraphResponse
+  timezone: string
 }
 
-export function MeasurementChart({ data }: MeasurementChartProps) {
+export function MeasurementChart({ data, timezone }: MeasurementChartProps) {
   const chartData = data.points.map((point) => ({
     ...point,
-    label: formatDisplayDate(point.recordedAt),
+    label: formatDisplayDateInTimezone(point.recordedAt, timezone),
   }))
 
   if (chartData.length === 0) {
