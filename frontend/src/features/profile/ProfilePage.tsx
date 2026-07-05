@@ -1,3 +1,4 @@
+import { LogOut } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
@@ -112,6 +113,20 @@ export function ProfilePage() {
       <Card>
         <h2 className="mb-4 text-lg font-semibold text-text">Change password</h2>
         <ChangePasswordForm onSubmit={(values) => changePassword(values)} />
+      </Card>
+
+      <Card>
+        <h2 className="mb-4 text-lg font-semibold text-text">Log out</h2>
+        <p className="mb-4 text-sm text-textMuted">Sign out of your account on this device.</p>
+        <Button
+          type="button"
+          variant="secondary"
+          onClick={() => logout.mutate()}
+          loading={logout.isPending}
+        >
+          <LogOut className="h-4 w-4" />
+          Log out
+        </Button>
       </Card>
 
       <DeleteAccountSection
