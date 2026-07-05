@@ -16,6 +16,15 @@ class MealRepository:
         result = await self.db.execute(select(Meal).where(Meal.id == meal_id))
         return result.scalar_one_or_none()
 
+    async def get_assignment(self, meal_id: UUID, client_id: UUID) -> MealAssignment | None:
+        result = await self.db.execute(
+            select(MealAssignment).where(
+                MealAssignment.meal_id == meal_id,
+                MealAssignment.client_id == client_id,
+            )
+        )
+        return result.scalar_one_or_none()
+
     async def list_for_client(
         self, client_id: UUID, category: str | None = None, page: int = 1, page_size: int = 10
     ) -> tuple[list[tuple[Meal, MealAssignment, MealCategory]], int]:

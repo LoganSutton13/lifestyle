@@ -97,8 +97,7 @@ class MealService:
             category = await self.meals.get_category(meal.category_key)
         if data.description is not None:
             meal.description = data.description
-        rows, _ = await self.meals.list_for_coach_client(coach_id, client_id, None, 1, 1)
-        assignment = next((a for m, a, _ in rows if m.id == meal_id), None)
+        assignment = await self.meals.get_assignment(meal_id, client_id)
         if not assignment:
             raise NotFoundError("Meal assignment not found")
         await self.db.commit()
