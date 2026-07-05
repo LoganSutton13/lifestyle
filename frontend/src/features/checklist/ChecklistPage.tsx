@@ -3,11 +3,10 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import confetti from 'canvas-confetti'
 import { ClipboardList } from 'lucide-react'
 import { EmptyState } from '../../components/ui/EmptyState'
-import { Input } from '../../components/ui/Input'
 import { Spinner } from '../../components/ui/Spinner'
 import { useToast } from '../../components/ui/Toast'
 import { getErrorMessage } from '../../lib/errors'
-import { getTodayDateString } from '../../lib/date'
+import { formatDisplayDate, getTodayDateString } from '../../lib/date'
 import * as checklistApi from './api'
 import { DailyNoteBox } from './DailyNoteBox'
 import { TaskItem } from './TaskItem'
@@ -17,6 +16,25 @@ export function ChecklistPage() {
   const queryClient = useQueryClient()
   const { showToast } = useToast()
   const previousAllComplete = useRef<boolean | null>(null)
+  const dateInputRef = useRef<HTMLInputElement>(null)
+
+  const openDatePicker = () => {
+    const input = dateInputRef.current
+    if (!input) {
+      return
+    }
+
+    if (typeof input.showPicker === 'function') {
+      try {
+        input.showPicker()
+        return
+      } catch {
+        // Fall through to click() when showPicker is blocked.
+      }
+    }
+
+    input.click()
+  }
 
   const query = useQuery({
     queryKey: ['checklist', date],
@@ -72,12 +90,28 @@ export function ChecklistPage() {
         <p className="text-sm text-textMuted">Complete your assigned activities</p>
       </div>
 
-      <Input
-        label="Date"
-        type="date"
-        value={date}
-        onChange={(event) => setDate(event.target.value)}
-      />
+      <div className="flex flex-col gap-1.5">
+        <span id="checklist-date-label" className="text-sm font-medium text-text">
+          Date
+        </span>
+        <button
+          type="button"
+          aria-labelledby="checklist-date-label"
+          onClick={openDatePicker}
+          className="inline-flex min-h-touch w-fit max-w-full cursor-pointer items-center rounded-xl border border-border bg-background px-3 py-2.5 text-base text-text transition-colors hover:border-primary/50 focus-visible:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20"
+        >
+          {formatDisplayDate(date)}
+        </button>
+        <input
+          ref={dateInputRef}
+          type="date"
+          value={date}
+          onChange={(event) => setDate(event.target.value)}
+          tabIndex={-1}
+          aria-hidden
+          className="sr-only"
+        />
+      </div>
 
       {query.isLoading ? <Spinner label="Loading checklist..." /> : null}
 
