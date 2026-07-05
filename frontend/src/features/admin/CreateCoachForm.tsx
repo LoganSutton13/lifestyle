@@ -12,8 +12,8 @@ const schema = z
     username: z.string().min(3).max(30),
     firstName: z.string().min(1),
     lastName: z.string().min(1),
-    password: z.string().min(10),
-    passwordConfirm: z.string().min(10),
+    password: z.string().min(6),
+    passwordConfirm: z.string().min(6),
   })
   .refine((data) => data.password === data.passwordConfirm, {
     message: 'Passwords do not match',

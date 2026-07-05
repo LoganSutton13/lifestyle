@@ -9,7 +9,7 @@ import { getErrorMessage } from '../../lib/errors'
 const passwordSchema = z
   .object({
     currentPassword: z.string().min(1, 'Current password is required'),
-    newPassword: z.string().min(10, 'Password must be at least 10 characters'),
+    newPassword: z.string().min(6, 'Password must be at least 6 characters'),
     newPasswordConfirm: z.string().min(10, 'Confirm your password'),
   })
   .refine((data) => data.newPassword === data.newPasswordConfirm, {
