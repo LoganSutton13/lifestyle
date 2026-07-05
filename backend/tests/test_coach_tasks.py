@@ -23,7 +23,9 @@ async def test_coach_can_update_client_task(
             "title": "10k steps",
             "description": "Walk today",
             "activeFrom": "2026-07-01",
-            "repeatsDaily": True,
+            "recurrenceFrequency": "daily",
+            "recurrenceInterval": 1,
+            "recurrenceDays": [],
         },
     )
     assert create_response.status_code == 201
@@ -37,7 +39,9 @@ async def test_coach_can_update_client_task(
             "description": "Walk more today",
             "activeFrom": "2026-07-02",
             "activeUntil": "2026-07-31",
-            "repeatsDaily": False,
+            "recurrenceFrequency": "weekly",
+            "recurrenceInterval": 2,
+            "recurrenceDays": [2],
         },
     )
     assert update_response.status_code == 200
@@ -46,7 +50,9 @@ async def test_coach_can_update_client_task(
     assert updated["description"] == "Walk more today"
     assert updated["activeFrom"] == "2026-07-02"
     assert updated["activeUntil"] == "2026-07-31"
-    assert updated["repeatsDaily"] is False
+    assert updated["recurrenceFrequency"] == "weekly"
+    assert updated["recurrenceInterval"] == 2
+    assert updated["recurrenceDays"] == [2]
 
     list_response = await client.get(
         f"/api/coach/clients/{client_user.id}/tasks?active=true",
@@ -101,3 +107,82 @@ async def test_coach_update_task_not_found(
         json={"title": "Missing"},
     )
     assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_weekly_task_appears_only_on_selected_weekday(
+    client: AsyncClient, db_session: AsyncSession
+) -> None:
+    coach = await create_user(db_session, "weekcoach", "coach")
+    client_user = await create_user(db_session, "weekclient", "client")
+    db_session.add(CoachClient(coach_id=coach.id, client_id=client_user.id))
+    await db_session.commit()
+
+    coach_token = await login(client, "weekcoach")
+    create_response = await client.post(
+        f"/api/coach/clients/{client_user.id}/tasks",
+        headers={"Authorization": f"Bearer {coach_token}"},
+        json={
+            "title": "Leg day",
+            "activeFrom": "2026-07-01",
+            "recurrenceFrequency": "weekly",
+            "recurrenceInterval": 1,
+            "recurrenceDays": [2],
+        },
+    )
+    assert create_response.status_code == 201
+
+    client_token = await login(client, "weekclient")
+    wednesday = await client.get(
+        "/api/me/checklist?date=2026-07-01",
+        headers={"Authorization": f"Bearer {client_token}"},
+    )
+    assert wednesday.status_code == 200
+    assert len(wednesday.json()["tasks"]) == 1
+
+    thursday = await client.get(
+        "/api/me/checklist?date=2026-07-02",
+        headers={"Authorization": f"Bearer {client_token}"},
+    )
+    assert thursday.status_code == 200
+    assert len(thursday.json()["tasks"]) == 0
+
+
+@pytest.mark.asyncio
+async def test_biweekly_task_alternates_weeks(
+    client: AsyncClient, db_session: AsyncSession
+) -> None:
+    coach = await create_user(db_session, "biweekcoach", "coach")
+    client_user = await create_user(db_session, "biweekclient", "client")
+    db_session.add(CoachClient(coach_id=coach.id, client_id=client_user.id))
+    await db_session.commit()
+
+    coach_token = await login(client, "biweekcoach")
+    await client.post(
+        f"/api/coach/clients/{client_user.id}/tasks",
+        headers={"Authorization": f"Bearer {coach_token}"},
+        json={
+            "title": "Long run",
+            "activeFrom": "2026-07-01",
+            "recurrenceFrequency": "weekly",
+            "recurrenceInterval": 2,
+            "recurrenceDays": [2],
+        },
+    )
+
+    client_token = await login(client, "biweekclient")
+    week_one = await client.get(
+        "/api/me/checklist?date=2026-07-01",
+        headers={"Authorization": f"Bearer {client_token}"},
+    )
+    week_two = await client.get(
+        "/api/me/checklist?date=2026-07-08",
+        headers={"Authorization": f"Bearer {client_token}"},
+    )
+    week_three = await client.get(
+        "/api/me/checklist?date=2026-07-15",
+        headers={"Authorization": f"Bearer {client_token}"},
+    )
+    assert len(week_one.json()["tasks"]) == 1
+    assert len(week_two.json()["tasks"]) == 0
+    assert len(week_three.json()["tasks"]) == 1

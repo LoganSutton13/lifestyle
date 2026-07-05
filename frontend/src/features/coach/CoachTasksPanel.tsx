@@ -10,6 +10,16 @@ import { getTodayDateString } from '../../lib/date'
 import { getErrorMessage } from '../../lib/errors'
 import * as coachApi from './api'
 import type { CoachTaskItem } from './api'
+import { DEFAULT_TASK_RECURRENCE, TaskRecurrenceFields } from './TaskRecurrenceFields'
+import { formatRecurrenceSummary, isRecurrenceValid, type TaskRecurrence } from './taskRecurrence'
+
+function taskToRecurrence(task: CoachTaskItem): TaskRecurrence {
+  return {
+    recurrenceFrequency: task.recurrenceFrequency,
+    recurrenceInterval: task.recurrenceInterval,
+    recurrenceDays: task.recurrenceDays,
+  }
+}
 
 export function CoachTasksPanel({ clientId }: { clientId: string }) {
   const queryClient = useQueryClient()
@@ -17,12 +27,13 @@ export function CoachTasksPanel({ clientId }: { clientId: string }) {
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [activeFrom, setActiveFrom] = useState(getTodayDateString())
+  const [recurrence, setRecurrence] = useState<TaskRecurrence>(DEFAULT_TASK_RECURRENCE)
   const [editingTask, setEditingTask] = useState<CoachTaskItem | null>(null)
   const [editTitle, setEditTitle] = useState('')
   const [editDescription, setEditDescription] = useState('')
   const [editActiveFrom, setEditActiveFrom] = useState('')
   const [editActiveUntil, setEditActiveUntil] = useState('')
-  const [editRepeatsDaily, setEditRepeatsDaily] = useState(true)
+  const [editRecurrence, setEditRecurrence] = useState<TaskRecurrence>(DEFAULT_TASK_RECURRENCE)
 
   const query = useQuery({
     queryKey: ['coach-client-tasks', clientId],
@@ -35,7 +46,7 @@ export function CoachTasksPanel({ clientId }: { clientId: string }) {
       setEditDescription(editingTask.description)
       setEditActiveFrom(editingTask.activeFrom)
       setEditActiveUntil(editingTask.activeUntil ?? '')
-      setEditRepeatsDaily(editingTask.repeatsDaily)
+      setEditRecurrence(taskToRecurrence(editingTask))
     }
   }, [editingTask])
 
@@ -45,12 +56,13 @@ export function CoachTasksPanel({ clientId }: { clientId: string }) {
         title,
         description,
         activeFrom,
-        repeatsDaily: true,
+        ...recurrence,
       }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['coach-client-tasks', clientId] })
       setTitle('')
       setDescription('')
+      setRecurrence(DEFAULT_TASK_RECURRENCE)
       showToast('Activity assigned')
     },
     onError: (error) => showToast(getErrorMessage(error), 'error'),
@@ -63,7 +75,7 @@ export function CoachTasksPanel({ clientId }: { clientId: string }) {
         description: editDescription,
         activeFrom: editActiveFrom,
         activeUntil: editActiveUntil || null,
-        repeatsDaily: editRepeatsDaily,
+        ...editRecurrence,
       }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['coach-client-tasks', clientId] })
@@ -82,10 +94,13 @@ export function CoachTasksPanel({ clientId }: { clientId: string }) {
     onError: (error) => showToast(getErrorMessage(error), 'error'),
   })
 
+  const canCreate = title.trim().length > 0 && isRecurrenceValid(recurrence)
+  const canSaveEdit = editTitle.trim().length > 0 && isRecurrenceValid(editRecurrence)
+
   return (
     <div className="space-y-4">
       <Card className="space-y-3">
-        <h3 className="font-semibold text-text">Assign daily activity</h3>
+        <h3 className="font-semibold text-text">Assign activity</h3>
         <Input label="Title" value={title} onChange={(e) => setTitle(e.target.value)} />
         <label className="flex flex-col gap-1.5 text-sm font-medium text-text">
           Description (optional)
@@ -102,7 +117,13 @@ export function CoachTasksPanel({ clientId }: { clientId: string }) {
           value={activeFrom}
           onChange={(e) => setActiveFrom(e.target.value)}
         />
-        <Button type="button" onClick={() => createMutation.mutate()} loading={createMutation.isPending}>
+        <TaskRecurrenceFields value={recurrence} onChange={setRecurrence} />
+        <Button
+          type="button"
+          disabled={!canCreate}
+          onClick={() => createMutation.mutate()}
+          loading={createMutation.isPending}
+        >
           Assign activity
         </Button>
       </Card>
@@ -121,7 +142,8 @@ export function CoachTasksPanel({ clientId }: { clientId: string }) {
                 <p className="mt-1 text-xs text-textMuted">
                   From {task.activeFrom}
                   {task.activeUntil ? ` until ${task.activeUntil}` : null}
-                  {task.repeatsDaily ? ' · Repeats daily' : null}
+                  {' · '}
+                  {formatRecurrenceSummary(taskToRecurrence(task))}
                 </p>
               </div>
               <div className="flex shrink-0 gap-2">
@@ -170,15 +192,7 @@ export function CoachTasksPanel({ clientId }: { clientId: string }) {
             value={editActiveUntil}
             onChange={(e) => setEditActiveUntil(e.target.value)}
           />
-          <label className="flex items-center gap-2 text-sm font-medium text-text">
-            <input
-              type="checkbox"
-              checked={editRepeatsDaily}
-              onChange={(e) => setEditRepeatsDaily(e.target.checked)}
-              className="h-4 w-4 rounded border-border"
-            />
-            Repeats daily
-          </label>
+          <TaskRecurrenceFields value={editRecurrence} onChange={setEditRecurrence} />
           <div className="flex gap-3 pt-2">
             <Button
               type="button"
@@ -191,7 +205,7 @@ export function CoachTasksPanel({ clientId }: { clientId: string }) {
             <Button
               type="button"
               className="flex-1"
-              disabled={!editTitle.trim()}
+              disabled={!canSaveEdit}
               loading={updateMutation.isPending}
               onClick={() => updateMutation.mutate()}
             >

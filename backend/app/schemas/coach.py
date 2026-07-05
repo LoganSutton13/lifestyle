@@ -63,7 +63,9 @@ class TaskCreateRequest(BaseModel):
     description: str = ""
     active_from: date = Field(alias="activeFrom")
     active_until: date | None = Field(default=None, alias="activeUntil")
-    repeats_daily: bool = Field(default=True, alias="repeatsDaily")
+    recurrence_frequency: str = Field(default="daily", alias="recurrenceFrequency")
+    recurrence_interval: int = Field(default=1, alias="recurrenceInterval")
+    recurrence_days: list[int] = Field(default_factory=list, alias="recurrenceDays")
 
     model_config = {"populate_by_name": True}
 
@@ -73,7 +75,9 @@ class TaskUpdateRequest(BaseModel):
     description: str | None = None
     active_from: date | None = Field(default=None, alias="activeFrom")
     active_until: date | None = Field(default=None, alias="activeUntil")
-    repeats_daily: bool | None = Field(default=None, alias="repeatsDaily")
+    recurrence_frequency: str | None = Field(default=None, alias="recurrenceFrequency")
+    recurrence_interval: int | None = Field(default=None, alias="recurrenceInterval")
+    recurrence_days: list[int] | None = Field(default=None, alias="recurrenceDays")
 
     model_config = {"populate_by_name": True}
 
@@ -84,7 +88,9 @@ class CoachTaskItem(BaseModel):
     description: str
     active_from: date = Field(alias="activeFrom")
     active_until: date | None = Field(alias="activeUntil")
-    repeats_daily: bool = Field(alias="repeatsDaily")
+    recurrence_frequency: str = Field(alias="recurrenceFrequency")
+    recurrence_interval: int = Field(alias="recurrenceInterval")
+    recurrence_days: list[int] = Field(alias="recurrenceDays")
     archived_at: datetime | None = Field(alias="archivedAt")
 
     model_config = {"populate_by_name": True}

@@ -18,6 +18,7 @@ from app.schemas.checklist import (
     TaskCompletionRequest,
 )
 from app.schemas.coach import CoachTaskItem, CoachTaskListResponse, TaskCreateRequest, TaskUpdateRequest
+from app.services.task_recurrence import normalize_recurrence_days, validate_recurrence
 
 MAX_RANGE_DAYS = 1095
 
@@ -26,6 +27,25 @@ class ChecklistService:
     def __init__(self, db: AsyncSession) -> None:
         self.db = db
         self.checklist = ChecklistRepository(db)
+
+    def _to_coach_task_item(self, task: AssignedTask) -> CoachTaskItem:
+        return CoachTaskItem(
+            id=task.id,
+            title=task.title,
+            description=task.description,
+            activeFrom=task.active_from,
+            activeUntil=task.active_until,
+            recurrenceFrequency=task.recurrence_frequency,
+            recurrenceInterval=task.recurrence_interval,
+            recurrenceDays=task.recurrence_days,
+            archivedAt=task.archived_at,
+        )
+
+    def _validate_task_recurrence(
+        self, frequency: str, interval: int, days: list[int]
+    ) -> list[int]:
+        validate_recurrence(frequency, interval, days)
+        return normalize_recurrence_days(frequency, days)
 
     async def get_checklist(self, client_id: UUID, target_date: date) -> ChecklistResponse:
         tasks = await self.checklist.list_active_tasks_for_date(client_id, target_date)
@@ -66,23 +86,15 @@ class ChecklistService:
     ) -> CoachTaskListResponse:
         tasks = await self.checklist.list_tasks_for_coach(coach_id, client_id, active_only)
         return CoachTaskListResponse(
-            items=[
-                CoachTaskItem(
-                    id=t.id,
-                    title=t.title,
-                    description=t.description,
-                    activeFrom=t.active_from,
-                    activeUntil=t.active_until,
-                    repeatsDaily=t.repeats_daily,
-                    archivedAt=t.archived_at,
-                )
-                for t in tasks
-            ]
+            items=[self._to_coach_task_item(t) for t in tasks]
         )
 
     async def create_task(self, coach_id: UUID, client_id: UUID, data: TaskCreateRequest) -> CoachTaskItem:
         if data.active_until and data.active_until < data.active_from:
             raise ValidationError("activeUntil must be on or after activeFrom")
+        recurrence_days = self._validate_task_recurrence(
+            data.recurrence_frequency, data.recurrence_interval, data.recurrence_days
+        )
         task = AssignedTask(
             coach_id=coach_id,
             client_id=client_id,
@@ -90,20 +102,14 @@ class ChecklistService:
             description=data.description,
             active_from=data.active_from,
             active_until=data.active_until,
-            repeats_daily=data.repeats_daily,
+            recurrence_frequency=data.recurrence_frequency,
+            recurrence_interval=data.recurrence_interval,
+            recurrence_days=recurrence_days,
         )
         await self.checklist.add_task(task)
         await self.db.commit()
         await self.db.refresh(task)
-        return CoachTaskItem(
-            id=task.id,
-            title=task.title,
-            description=task.description,
-            activeFrom=task.active_from,
-            activeUntil=task.active_until,
-            repeatsDaily=task.repeats_daily,
-            archivedAt=task.archived_at,
-        )
+        return self._to_coach_task_item(task)
 
     async def update_task(
         self, coach_id: UUID, client_id: UUID, task_id: UUID, data: TaskUpdateRequest
@@ -119,21 +125,17 @@ class ChecklistService:
             task.active_from = data.active_from
         if data.active_until is not None:
             task.active_until = data.active_until
-        if data.repeats_daily is not None:
-            task.repeats_daily = data.repeats_daily
+        frequency = data.recurrence_frequency if data.recurrence_frequency is not None else task.recurrence_frequency
+        interval = data.recurrence_interval if data.recurrence_interval is not None else task.recurrence_interval
+        days = data.recurrence_days if data.recurrence_days is not None else task.recurrence_days
+        task.recurrence_days = self._validate_task_recurrence(frequency, interval, days)
+        task.recurrence_frequency = frequency
+        task.recurrence_interval = interval
         if task.active_until and task.active_until < task.active_from:
             raise ValidationError("activeUntil must be on or after activeFrom")
         await self.db.commit()
         await self.db.refresh(task)
-        return CoachTaskItem(
-            id=task.id,
-            title=task.title,
-            description=task.description,
-            activeFrom=task.active_from,
-            activeUntil=task.active_until,
-            repeatsDaily=task.repeats_daily,
-            archivedAt=task.archived_at,
-        )
+        return self._to_coach_task_item(task)
 
     async def delete_task(self, coach_id: UUID, client_id: UUID, task_id: UUID) -> None:
         task = await self.checklist.get_task(task_id)
