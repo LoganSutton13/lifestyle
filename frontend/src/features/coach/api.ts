@@ -52,7 +52,9 @@ export interface CoachTaskItem {
   description: string
   activeFrom: string
   activeUntil: string | null
-  repeatsDaily: boolean
+  recurrenceFrequency: 'daily' | 'weekly'
+  recurrenceInterval: number
+  recurrenceDays: number[]
   archivedAt: string | null
 }
 
@@ -152,7 +154,9 @@ export function createClientTask(
     description?: string
     activeFrom: string
     activeUntil?: string | null
-    repeatsDaily?: boolean
+    recurrenceFrequency?: 'daily' | 'weekly'
+    recurrenceInterval?: number
+    recurrenceDays?: number[]
   },
 ): Promise<CoachTaskItem> {
   return apiRequest<CoachTaskItem>(`/api/coach/clients/${clientId}/tasks`, {
@@ -169,7 +173,9 @@ export function updateClientTask(
     description: string
     activeFrom: string
     activeUntil: string | null
-    repeatsDaily: boolean
+    recurrenceFrequency: 'daily' | 'weekly'
+    recurrenceInterval: number
+    recurrenceDays: number[]
   }>,
 ): Promise<CoachTaskItem> {
   return apiRequest<CoachTaskItem>(`/api/coach/clients/${clientId}/tasks/${taskId}`, {

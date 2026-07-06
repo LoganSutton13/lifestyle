@@ -1,7 +1,7 @@
 import uuid
 from datetime import date, datetime
 
-from sqlalchemy import Boolean, Date, DateTime, ForeignKey, Index, Text, func
+from sqlalchemy import Date, DateTime, ForeignKey, Index, Integer, JSON, Text, func
 from sqlalchemy import Uuid
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -26,7 +26,9 @@ class AssignedTask(Base):
     description: Mapped[str] = mapped_column(Text, nullable=False, default="")
     active_from: Mapped[date] = mapped_column(Date, nullable=False, server_default=func.current_date())
     active_until: Mapped[date | None] = mapped_column(Date, nullable=True)
-    repeats_daily: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    recurrence_frequency: Mapped[str] = mapped_column(Text, nullable=False, default="daily")
+    recurrence_interval: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+    recurrence_days: Mapped[list[int]] = mapped_column(JSON, nullable=False, default=list)
     archived_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at: Mapped[datetime] = mapped_column(

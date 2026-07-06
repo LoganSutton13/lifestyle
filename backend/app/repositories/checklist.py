@@ -7,6 +7,18 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.models.assigned_task import AssignedTask
 from app.db.models.daily_note import DailyNote
 from app.db.models.task_completion import TaskCompletion
+from app.services.task_recurrence import task_occurs_on_date
+
+
+def _task_matches_date(task: AssignedTask, target_date: date) -> bool:
+    return task_occurs_on_date(
+        task.active_from,
+        task.active_until,
+        task.recurrence_frequency,
+        task.recurrence_interval,
+        task.recurrence_days,
+        target_date,
+    )
 
 
 class ChecklistRepository:
@@ -28,7 +40,7 @@ class ChecklistRepository:
             )
             .order_by(AssignedTask.created_at.asc())
         )
-        return list(result.scalars().all())
+        return [task for task in result.scalars().all() if _task_matches_date(task, target_date)]
 
     async def list_tasks_for_coach(
         self, coach_id: UUID, client_id: UUID, active_only: bool = True
@@ -123,7 +135,7 @@ class ChecklistRepository:
             active_tasks = [
                 t
                 for t in tasks
-                if t.active_from <= current and (t.active_until is None or t.active_until >= current)
+                if _task_matches_date(t, current)
             ]
             if active_tasks:
                 completions = await self.completions_for_date(client_id, current)
