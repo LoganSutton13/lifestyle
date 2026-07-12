@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Plus } from 'lucide-react'
+import { Alert } from '../../components/ui/Alert'
+import { PageTitle } from '../../components/ui/PageTitle'
 import { Spinner } from '../../components/ui/Spinner'
 import { useToast } from '../../components/ui/Toast'
 import { MAX_MEASUREMENT_RANGE_DAYS, RANGE_PRESETS, type RangePresetKey } from '../../lib/constants'
@@ -86,7 +88,7 @@ export function DataPage() {
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between gap-3">
-        <h1 className="text-2xl font-bold text-text">Data</h1>
+        <PageTitle>Data</PageTitle>
         <button
           type="button"
           aria-label="Add measurement"
@@ -111,11 +113,7 @@ export function DataPage() {
 
       {graphQuery.isLoading ? <Spinner label="Loading chart..." /> : null}
 
-      {graphQuery.isError ? (
-        <p className="rounded-xl bg-danger/10 px-4 py-3 text-sm text-danger">
-          {getErrorMessage(graphQuery.error)}
-        </p>
-      ) : null}
+      {graphQuery.isError ? <Alert>{getErrorMessage(graphQuery.error)}</Alert> : null}
 
       {graphQuery.isSuccess ? <MeasurementChart data={graphQuery.data} timezone={timezone} /> : null}
 

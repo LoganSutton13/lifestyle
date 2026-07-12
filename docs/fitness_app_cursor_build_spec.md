@@ -162,7 +162,7 @@ const theme = {
 - Destructive actions must be red/danger styling with confirmation.
 
 ### Client bottom navigation
-A fixed bottom home bar must be present on client app pages. It contains exactly four options:
+A fixed bottom home bar must be present on client app pages. It contains five options:
 
 Left to right:
 
@@ -172,12 +172,17 @@ Left to right:
 2. Checklist
    - Icon: checkmark/checklist icon, for example `CheckSquare` or `CircleCheck`.
    - Route: `/app/checklist`
-3. Data
+3. Workout
+   - Icon: `Dumbbell` from lucide-react.
+   - Route: `/app/workouts` (also active for nested `/app/workouts/*` routes)
+4. Data
    - Icon: graph/chart icon, for example `LineChart`.
    - Route: `/app/data`
-4. Profile
+5. Profile
    - Icon: user/profile icon, for example `UserCircle`.
    - Route: `/app/profile`
+
+The Workout tab and workout domain are specified in full by `docs/workout_exercise_tracking_exact_spec.md`, which supersedes this document for workout-related behavior.
 
 The bottom nav must:
 - Be fixed to the bottom.
@@ -186,6 +191,7 @@ The bottom nav must:
 - Highlight the active tab in cyan-blue.
 - Respect iOS safe-area inset using `padding-bottom: env(safe-area-inset-bottom)`.
 - Never use emoji icons.
+- Use compact labels so five items remain usable at a 390-pixel viewport width.
 
 ## 5. Frontend Routes
 
@@ -198,10 +204,16 @@ The bottom nav must:
 | `/register` | Client self-registration page | Public |
 | `/app/meals` | Client meal plan page | Client |
 | `/app/checklist` | Client checklist page | Client |
+| `/app/workouts` | Client workouts hub | Client |
+| `/app/workouts/active/:sessionId` | Active workout logging | Client |
+| `/app/workouts/history/:sessionId` | Completed workout detail | Client |
 | `/app/data` | Client data graphs page | Client |
 | `/app/profile` | Client profile page | Client |
 | `/coach` | Coach dashboard/client list | Coach |
 | `/coach/clients/:clientId` | Coach client detail dashboard | Coach |
+| `/coach/exercises` | Coach exercise library | Coach |
+| `/coach/workouts/templates` | Coach workout templates | Coach |
+| `/coach/workouts/templates/:templateId` | Template editor | Coach |
 | `/coach/profile` | Coach profile/password page | Coach |
 
 ### Admin routes
@@ -211,6 +223,7 @@ The bottom nav must:
 | `/admin/login` | Admin-only login page | Public, but only accepts admin users |
 | `/admin` | Admin dashboard | Admin |
 | `/admin/users` | User management | Admin |
+| `/admin/exercises` | Global exercise catalog management | Admin |
 | `/admin/settings` | Admin password/settings | Admin |
 
 ### Redirect rules

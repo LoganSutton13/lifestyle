@@ -1,8 +1,10 @@
 import { Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { Users } from 'lucide-react'
+import { Alert } from '../../components/ui/Alert'
 import { Card } from '../../components/ui/Card'
 import { EmptyState } from '../../components/ui/EmptyState'
+import { PageTitle } from '../../components/ui/PageTitle'
 import { Spinner } from '../../components/ui/Spinner'
 import { avatarUrl } from '../../lib/constants'
 import { getErrorMessage } from '../../lib/errors'
@@ -17,17 +19,13 @@ export function CoachDashboard() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-text">Clients</h1>
+      <PageTitle>Clients</PageTitle>
 
       <ClientSearchAdd />
 
       {query.isLoading ? <Spinner label="Loading clients..." /> : null}
 
-      {query.isError ? (
-        <p className="rounded-xl bg-danger/10 px-4 py-3 text-sm text-danger">
-          {getErrorMessage(query.error)}
-        </p>
-      ) : null}
+      {query.isError ? <Alert>{getErrorMessage(query.error)}</Alert> : null}
 
       {query.isSuccess && query.data.items.length === 0 ? (
         <EmptyState

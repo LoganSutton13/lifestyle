@@ -1,13 +1,15 @@
 import { Card } from '../../components/ui/Card'
+import { PageTitle } from '../../components/ui/PageTitle'
+import { SectionTitle } from '../../components/ui/SectionTitle'
 import { changePassword } from '../auth/api'
 import { ChangePasswordForm } from '../profile/ChangePasswordForm'
 
 export function AdminSettingsPage() {
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-text">Admin Settings</h1>
+      <PageTitle>Admin Settings</PageTitle>
       <Card>
-        <h2 className="mb-4 text-lg font-semibold text-text">Change password</h2>
+        <SectionTitle className="mb-4">Change password</SectionTitle>
         <ChangePasswordForm onSubmit={(values) => changePassword(values)} />
       </Card>
     </div>

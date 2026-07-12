@@ -1,5 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { Card } from '../../components/ui/Card'
+import { PageTitle } from '../../components/ui/PageTitle'
+import { SectionTitle } from '../../components/ui/SectionTitle'
 import { CreateCoachForm } from './CreateCoachForm'
 import { DeleteAccountPanel } from './DeleteAccountPanel'
 import { ElevateClientForm } from './ElevateClientForm'
@@ -15,15 +17,15 @@ export function AdminUsersPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-text">User Management</h1>
+      <PageTitle>User Management</PageTitle>
 
       <Card>
-        <h2 className="mb-4 text-lg font-semibold text-text">Create coach account</h2>
+        <SectionTitle className="mb-4">Create coach account</SectionTitle>
         <CreateCoachForm onSuccess={invalidate} />
       </Card>
 
       <Card>
-        <h2 className="mb-4 text-lg font-semibold text-text">Elevate client to coach</h2>
+        <SectionTitle className="mb-4">Elevate client to coach</SectionTitle>
         <ElevateClientForm onSuccess={invalidate} />
       </Card>
 

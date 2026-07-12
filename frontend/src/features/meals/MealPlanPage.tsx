@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { UtensilsCrossed } from 'lucide-react'
+import { Alert } from '../../components/ui/Alert'
 import { Button } from '../../components/ui/Button'
 import { EmptyState } from '../../components/ui/EmptyState'
+import { PageTitle } from '../../components/ui/PageTitle'
 import { Spinner } from '../../components/ui/Spinner'
 import { getErrorMessage } from '../../lib/errors'
 import type { MealCategoryKey } from '../../lib/constants'
@@ -26,17 +28,13 @@ export function MealPlanPage() {
 
   return (
     <div className="space-y-5">
-      <h1 className="text-2xl font-bold text-text">Meal Plan</h1>
+      <PageTitle>Meal Plan</PageTitle>
 
       <MealFilterTabs value={category} onChange={handleCategoryChange} />
 
       {query.isLoading ? <Spinner label="Loading meals..." /> : null}
 
-      {query.isError ? (
-        <p className="rounded-xl bg-danger/10 px-4 py-3 text-sm text-danger">
-          {getErrorMessage(query.error)}
-        </p>
-      ) : null}
+      {query.isError ? <Alert>{getErrorMessage(query.error)}</Alert> : null}
 
       {query.isSuccess && query.data.items.length === 0 ? (
         <EmptyState

@@ -4,7 +4,9 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useQuery } from '@tanstack/react-query'
 import { Button } from '../../components/ui/Button'
+import { DangerZone } from '../../components/ui/DangerZone'
 import { Input } from '../../components/ui/Input'
+import { MutedText } from '../../components/ui/MutedText'
 import { Select } from '../../components/ui/Select'
 import { useToast } from '../../components/ui/Toast'
 import { getErrorMessage } from '../../lib/errors'
@@ -59,13 +61,10 @@ export function DeleteAccountPanel({ onSuccess }: { onSuccess?: () => void }) {
     })) ?? []
 
   return (
-    <form className="space-y-4 rounded-2xl border border-danger/30 bg-danger/5 p-4" onSubmit={submit}>
-      <div>
-        <h2 className="text-lg font-semibold text-danger">Delete any account</h2>
-        <p className="mt-1 text-sm text-textMuted">
-          Requires your admin password and exact username confirmation.
-        </p>
-      </div>
+    <DangerZone as="form" title="Delete any account" onSubmit={submit}>
+      <MutedText>
+        Requires your admin password and exact username confirmation.
+      </MutedText>
       <Input label="Search users" value={search} onChange={(e) => setSearch(e.target.value)} />
       <Select
         label="User to delete"
@@ -88,6 +87,6 @@ export function DeleteAccountPanel({ onSuccess }: { onSuccess?: () => void }) {
       <Button type="submit" variant="danger" loading={isSubmitting}>
         Delete account
       </Button>
-    </form>
+    </DangerZone>
   )
 }

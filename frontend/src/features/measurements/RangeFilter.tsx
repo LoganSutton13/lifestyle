@@ -1,4 +1,5 @@
-import { cn, RANGE_PRESETS, type RangePresetKey } from '../../lib/constants'
+import { RANGE_PRESETS, type RangePresetKey } from '../../lib/constants'
+import { PillTabs } from '../../components/ui/PillTabs'
 
 export interface RangeFilterProps {
   value: RangePresetKey
@@ -7,22 +8,15 @@ export interface RangeFilterProps {
 
 export function RangeFilter({ value, onChange }: RangeFilterProps) {
   return (
-    <div className="flex flex-wrap gap-2" role="group" aria-label="Time range">
-      {RANGE_PRESETS.map((preset) => (
-        <button
-          key={preset.key}
-          type="button"
-          onClick={() => onChange(preset.key)}
-          className={cn(
-            'min-h-touch rounded-full px-3 py-2 text-sm font-medium transition-colors',
-            value === preset.key
-              ? 'bg-primary text-white'
-              : 'bg-surface text-textMuted hover:bg-primarySoft hover:text-primaryDark',
-          )}
-        >
-          {preset.label}
-        </button>
-      ))}
-    </div>
+    <PillTabs
+      options={RANGE_PRESETS.map((preset) => ({
+        value: preset.key,
+        label: preset.label,
+      }))}
+      value={value}
+      onChange={onChange}
+      ariaLabel="Time range"
+      layout="wrap"
+    />
   )
 }

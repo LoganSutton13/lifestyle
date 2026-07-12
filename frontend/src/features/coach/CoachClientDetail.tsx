@@ -1,21 +1,25 @@
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
-import { cn } from '../../lib/cn'
+import { MutedText } from '../../components/ui/MutedText'
+import { PageTitle } from '../../components/ui/PageTitle'
+import { PillTabs } from '../../components/ui/PillTabs'
 import { CoachMealsPanel } from './CoachMealsPanel'
 import { CoachMeasurementsPanel } from './CoachMeasurementsPanel'
 import { CoachNotesPanel } from './CoachNotesPanel'
 import { CoachTasksPanel } from './CoachTasksPanel'
+import { CoachWorkoutsPanel } from './workouts/CoachWorkoutsPanel'
 
 const tabs = [
-  { key: 'overview', label: 'Overview' },
-  { key: 'meals', label: 'Meals' },
-  { key: 'tasks', label: 'Daily Activities' },
-  { key: 'measurements', label: 'Measurements' },
-  { key: 'notes', label: 'History / Notes' },
+  { value: 'overview', label: 'Overview' },
+  { value: 'meals', label: 'Meals' },
+  { value: 'tasks', label: 'Daily Activities' },
+  { value: 'workouts', label: 'Workouts' },
+  { value: 'measurements', label: 'Measurements' },
+  { value: 'notes', label: 'History / Notes' },
 ] as const
 
-type TabKey = (typeof tabs)[number]['key']
+type TabKey = (typeof tabs)[number]['value']
 
 export function CoachClientDetail() {
   const { clientId = '' } = useParams()
@@ -31,33 +35,25 @@ export function CoachClientDetail() {
         Back to clients
       </Link>
 
-      <h1 className="text-2xl font-bold text-text">Client dashboard</h1>
+      <PageTitle>Client dashboard</PageTitle>
 
-      <div className="flex gap-2 overflow-x-auto pb-1">
-        {tabs.map((tab) => (
-          <button
-            key={tab.key}
-            type="button"
-            onClick={() => setActiveTab(tab.key)}
-            className={cn(
-              'min-h-touch shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-colors',
-              activeTab === tab.key
-                ? 'bg-primary text-white'
-                : 'bg-surface text-textMuted hover:bg-primarySoft hover:text-primaryDark',
-            )}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
+      <PillTabs
+        options={[...tabs]}
+        value={activeTab}
+        onChange={setActiveTab}
+        ariaLabel="Client sections"
+        layout="scroll"
+      />
 
       {activeTab === 'overview' ? (
-        <p className="text-sm text-textMuted">
-          Use the tabs above to manage meals, daily activities, measurements, and notes for this client.
-        </p>
+        <MutedText>
+          Use the tabs above to manage meals, daily activities, workouts, measurements, and notes for this
+          client.
+        </MutedText>
       ) : null}
       {activeTab === 'meals' ? <CoachMealsPanel clientId={clientId} /> : null}
       {activeTab === 'tasks' ? <CoachTasksPanel clientId={clientId} /> : null}
+      {activeTab === 'workouts' ? <CoachWorkoutsPanel clientId={clientId} /> : null}
       {activeTab === 'measurements' ? <CoachMeasurementsPanel clientId={clientId} /> : null}
       {activeTab === 'notes' ? <CoachNotesPanel clientId={clientId} /> : null}
     </div>

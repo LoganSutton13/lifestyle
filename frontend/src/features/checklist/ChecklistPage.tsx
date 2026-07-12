@@ -2,8 +2,11 @@ import { useEffect, useRef, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import confetti from 'canvas-confetti'
 import { ClipboardList } from 'lucide-react'
+import { Alert } from '../../components/ui/Alert'
 import { EmptyState } from '../../components/ui/EmptyState'
 import { Input } from '../../components/ui/Input'
+import { MutedText } from '../../components/ui/MutedText'
+import { PageTitle } from '../../components/ui/PageTitle'
 import { Spinner } from '../../components/ui/Spinner'
 import { useToast } from '../../components/ui/Toast'
 import { getErrorMessage } from '../../lib/errors'
@@ -68,8 +71,8 @@ export function ChecklistPage() {
   return (
     <div className="space-y-5">
       <div>
-        <h1 className="text-2xl font-bold text-text">Today&apos;s Checklist</h1>
-        <p className="text-sm text-textMuted">Complete your assigned activities</p>
+        <PageTitle>Today&apos;s Checklist</PageTitle>
+        <MutedText>Complete your assigned activities</MutedText>
       </div>
 
       <Input
@@ -81,11 +84,7 @@ export function ChecklistPage() {
 
       {query.isLoading ? <Spinner label="Loading checklist..." /> : null}
 
-      {query.isError ? (
-        <p className="rounded-xl bg-danger/10 px-4 py-3 text-sm text-danger">
-          {getErrorMessage(query.error)}
-        </p>
-      ) : null}
+      {query.isError ? <Alert>{getErrorMessage(query.error)}</Alert> : null}
 
       {query.isSuccess && query.data.tasks.length === 0 ? (
         <EmptyState

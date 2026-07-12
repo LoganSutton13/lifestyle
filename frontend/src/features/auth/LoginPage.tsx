@@ -5,6 +5,7 @@ import { z } from 'zod'
 import { Button } from '../../components/ui/Button'
 import { Card } from '../../components/ui/Card'
 import { Input } from '../../components/ui/Input'
+import { PageTitle } from '../../components/ui/PageTitle'
 import { getErrorMessage } from '../../lib/errors'
 import { useLogin } from './hooks'
 
@@ -28,7 +29,7 @@ export function LoginPage() {
   return (
     <div className="mx-auto flex min-h-screen max-w-client flex-col justify-center px-4 py-8">
       <div className="mb-8 text-center">
-        <h1 className="text-3xl font-bold text-text">Lifestyle</h1>
+        <PageTitle size="lg">Lifestyle</PageTitle>
         <p className="mt-2 text-textMuted">Sign in to your account</p>
       </div>
 

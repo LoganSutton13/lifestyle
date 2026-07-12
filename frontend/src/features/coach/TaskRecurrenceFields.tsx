@@ -1,6 +1,6 @@
 import { Input } from '../../components/ui/Input'
 import { Select } from '../../components/ui/Select'
-import { cn } from '../../lib/constants'
+import { cn } from '../../lib/cn'
 import {
   DEFAULT_TASK_RECURRENCE,
   WEEKDAY_LABELS,

@@ -6,6 +6,7 @@ import { Input } from '../../components/ui/Input'
 import { Modal } from '../../components/ui/Modal'
 import { Select } from '../../components/ui/Select'
 import { Spinner } from '../../components/ui/Spinner'
+import { Textarea } from '../../components/ui/Textarea'
 import { useToast } from '../../components/ui/Toast'
 import { MEAL_CATEGORIES } from '../../lib/constants'
 import { getErrorMessage } from '../../lib/errors'
@@ -82,15 +83,12 @@ export function CoachMealsPanel({ clientId }: { clientId: string }) {
         <h3 className="font-semibold text-text">Assign meal</h3>
         <Input label="Meal name" value={name} onChange={(e) => setName(e.target.value)} />
         <Select label="Category" options={categoryOptions} value={category} onChange={(e) => setCategory(e.target.value)} />
-        <label className="flex flex-col gap-1.5 text-sm font-medium text-text">
-          Description
-          <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            rows={3}
-            className="rounded-xl border border-border px-3 py-2.5 font-normal"
-          />
-        </label>
+        <Textarea
+          label="Description"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          rows={3}
+        />
         <Button type="button" onClick={() => createMutation.mutate()} loading={createMutation.isPending}>
           Assign meal
         </Button>
@@ -136,15 +134,12 @@ export function CoachMealsPanel({ clientId }: { clientId: string }) {
             value={editCategory}
             onChange={(e) => setEditCategory(e.target.value)}
           />
-          <label className="flex flex-col gap-1.5 text-sm font-medium text-text">
-            Description
-            <textarea
-              value={editDescription}
-              onChange={(e) => setEditDescription(e.target.value)}
-              rows={3}
-              className="rounded-xl border border-border px-3 py-2.5 font-normal"
-            />
-          </label>
+          <Textarea
+            label="Description"
+            value={editDescription}
+            onChange={(e) => setEditDescription(e.target.value)}
+            rows={3}
+          />
           <div className="flex gap-3 pt-2">
             <Button
               type="button"

@@ -2,7 +2,9 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Button } from '../../components/ui/Button'
+import { DangerZone } from '../../components/ui/DangerZone'
 import { Input } from '../../components/ui/Input'
+import { MutedText } from '../../components/ui/MutedText'
 import { useToast } from '../../components/ui/Toast'
 import { getErrorMessage } from '../../lib/errors'
 
@@ -42,13 +44,10 @@ export function DeleteAccountSection({ onDelete }: DeleteAccountSectionProps) {
   })
 
   return (
-    <section className="space-y-4 rounded-2xl border border-danger/30 bg-danger/5 p-4">
-      <div>
-        <h2 className="text-lg font-semibold text-danger">Delete account</h2>
-        <p className="mt-1 text-sm text-textMuted">
-          This will permanently delete your account and associated application data.
-        </p>
-      </div>
+    <DangerZone title="Delete account">
+      <MutedText>
+        This will permanently delete your account and associated application data.
+      </MutedText>
       <form className="space-y-4" onSubmit={submit}>
         <Input
           label="Current password"
@@ -61,6 +60,6 @@ export function DeleteAccountSection({ onDelete }: DeleteAccountSectionProps) {
           Delete my account
         </Button>
       </form>
-    </section>
+    </DangerZone>
   )
 }

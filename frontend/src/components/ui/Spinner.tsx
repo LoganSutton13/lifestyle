@@ -1,4 +1,4 @@
-import { cn } from '../../lib/constants'
+import { cn } from '../../lib/cn'
 
 export interface SpinnerProps {
   className?: string

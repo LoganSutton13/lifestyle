@@ -1,4 +1,5 @@
 import { Check } from 'lucide-react'
+import { Card } from '../../components/ui/Card'
 import { cn } from '../../lib/cn'
 import type { ChecklistTask } from './api'
 
@@ -10,7 +11,7 @@ export interface TaskItemProps {
 
 export function TaskItem({ task, disabled, onToggle }: TaskItemProps) {
   return (
-    <div className="flex items-start gap-3 rounded-2xl border border-border bg-surfaceElevated p-4">
+    <Card className="flex items-start gap-3">
       <div className="min-w-0 flex-1">
         <h3 className="font-medium text-text">{task.title}</h3>
         {task.description ? (
@@ -33,6 +34,6 @@ export function TaskItem({ task, disabled, onToggle }: TaskItemProps) {
       >
         {task.completed ? <Check className="h-5 w-5" /> : null}
       </button>
-    </div>
+    </Card>
   )
 }

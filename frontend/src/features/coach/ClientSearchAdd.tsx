@@ -4,6 +4,8 @@ import { Plus, Search } from 'lucide-react'
 import { Button } from '../../components/ui/Button'
 import { Card } from '../../components/ui/Card'
 import { Input } from '../../components/ui/Input'
+import { MutedText } from '../../components/ui/MutedText'
+import { SectionTitle } from '../../components/ui/SectionTitle'
 import { Spinner } from '../../components/ui/Spinner'
 import { useToast } from '../../components/ui/Toast'
 import { avatarUrl } from '../../lib/constants'
@@ -37,7 +39,7 @@ export function ClientSearchAdd() {
 
   return (
     <Card className="space-y-4">
-      <h2 className="text-lg font-semibold text-text">Add existing client</h2>
+      <SectionTitle>Add existing client</SectionTitle>
       <div className="flex gap-2">
         <Input
           label="Search clients"
@@ -60,7 +62,7 @@ export function ClientSearchAdd() {
       {searchQuery.isSuccess && searchTerm ? (
         <div className="space-y-2">
           {searchQuery.data.items.length === 0 ? (
-            <p className="text-sm text-textMuted">No clients found.</p>
+            <MutedText>No clients found.</MutedText>
           ) : (
             searchQuery.data.items.map((client) => (
               <div

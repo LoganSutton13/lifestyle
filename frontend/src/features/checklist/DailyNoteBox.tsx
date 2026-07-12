@@ -1,5 +1,9 @@
 import { useEffect, useState } from 'react'
 import { Button } from '../../components/ui/Button'
+import { Card } from '../../components/ui/Card'
+import { MutedText } from '../../components/ui/MutedText'
+import { SectionTitle } from '../../components/ui/SectionTitle'
+import { Textarea } from '../../components/ui/Textarea'
 
 export interface DailyNoteBoxProps {
   value: string
@@ -23,17 +27,16 @@ export function DailyNoteBox({ value, updatedAt, saving, onSave }: DailyNoteBoxP
   }
 
   return (
-    <section className="space-y-3 rounded-2xl border border-border bg-surfaceElevated p-4">
+    <Card className="space-y-3">
       <div>
-        <h2 className="text-lg font-semibold text-text">Daily Notes</h2>
-        <p className="text-sm text-textMuted">Share how your day went with your coach.</p>
+        <SectionTitle>Daily Notes</SectionTitle>
+        <MutedText>Share how your day went with your coach.</MutedText>
       </div>
-      <textarea
+      <Textarea
         value={body}
         onChange={(event) => setBody(event.target.value)}
         rows={4}
         placeholder="How did today go?"
-        className="w-full rounded-xl border border-border bg-background px-3 py-2.5 text-base text-text outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
       />
       <div className="flex items-center justify-between gap-3">
         <Button type="button" onClick={handleSave} loading={saving}>
@@ -41,9 +44,11 @@ export function DailyNoteBox({ value, updatedAt, saving, onSave }: DailyNoteBoxP
         </Button>
         {savedMessage ? <span className="text-sm text-success">{savedMessage}</span> : null}
         {!savedMessage && updatedAt ? (
-          <span className="text-xs text-textMuted">Last updated {new Date(updatedAt).toLocaleString()}</span>
+          <MutedText as="span" size="xs">
+            Last updated {new Date(updatedAt).toLocaleString()}
+          </MutedText>
         ) : null}
       </div>
-    </section>
+    </Card>
   )
 }

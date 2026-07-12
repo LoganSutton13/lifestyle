@@ -5,6 +5,7 @@ import { Shield } from 'lucide-react'
 import { Button } from '../../components/ui/Button'
 import { Card } from '../../components/ui/Card'
 import { Input } from '../../components/ui/Input'
+import { PageTitle } from '../../components/ui/PageTitle'
 import { getErrorMessage } from '../../lib/errors'
 import { useLogin } from './hooks'
 
@@ -38,7 +39,7 @@ export function AdminLoginPage() {
         <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-primarySoft text-primary">
           <Shield className="h-7 w-7" />
         </div>
-        <h1 className="text-3xl font-bold text-text">Admin Sign In</h1>
+        <PageTitle size="lg">Admin Sign In</PageTitle>
         <p className="mt-2 text-textMuted">Restricted access for administrators only</p>
       </div>
 

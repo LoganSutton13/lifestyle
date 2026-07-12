@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react'
 import { CheckCircle, XCircle } from 'lucide-react'
-import { cn } from '../../lib/constants'
+import { cn } from '../../lib/cn'
 
 type ToastVariant = 'success' | 'error'
 

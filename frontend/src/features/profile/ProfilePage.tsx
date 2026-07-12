@@ -4,6 +4,9 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { Card } from '../../components/ui/Card'
 import { Input } from '../../components/ui/Input'
+import { MutedText } from '../../components/ui/MutedText'
+import { PageTitle } from '../../components/ui/PageTitle'
+import { SectionTitle } from '../../components/ui/SectionTitle'
 import { Select } from '../../components/ui/Select'
 import { Button } from '../../components/ui/Button'
 import { useToast } from '../../components/ui/Toast'
@@ -71,20 +74,20 @@ export function ProfilePage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-text">Profile</h1>
+      <PageTitle>Profile</PageTitle>
 
       <Card className="flex items-center gap-4">
         <img src={avatarUrl(avatarKey)} alt="" className="h-16 w-16 rounded-2xl bg-surface p-2" />
         <div>
-          <p className="text-lg font-semibold text-text">
+          <SectionTitle as="p">
             {user.firstName} {user.lastName}
-          </p>
-          <p className="text-sm text-textMuted">@{user.username}</p>
+          </SectionTitle>
+          <MutedText>@{user.username}</MutedText>
         </div>
       </Card>
 
       <section className="space-y-3">
-        <h2 className="text-lg font-semibold text-text">Avatar</h2>
+        <SectionTitle>Avatar</SectionTitle>
         <AvatarPicker value={avatarKey} onChange={setAvatarKey} />
       </section>
 
@@ -95,7 +98,7 @@ export function ProfilePage() {
             profileMutation.mutate({ ...values, avatarKey }),
           )}
         >
-          <h2 className="text-lg font-semibold text-text">Account information</h2>
+          <SectionTitle>Account information</SectionTitle>
           <Input label="Username" {...register('username')} />
           <Input label="First name" {...register('firstName')} />
           <Input label="Last name" {...register('lastName')} />
@@ -111,13 +114,13 @@ export function ProfilePage() {
       </Card>
 
       <Card>
-        <h2 className="mb-4 text-lg font-semibold text-text">Change password</h2>
+        <SectionTitle className="mb-4">Change password</SectionTitle>
         <ChangePasswordForm onSubmit={(values) => changePassword(values)} />
       </Card>
 
       <Card>
-        <h2 className="mb-4 text-lg font-semibold text-text">Log out</h2>
-        <p className="mb-4 text-sm text-textMuted">Sign out of your account on this device.</p>
+        <SectionTitle className="mb-4">Log out</SectionTitle>
+        <MutedText className="mb-4">Sign out of your account on this device.</MutedText>
         <Button
           type="button"
           variant="secondary"

@@ -1,6 +1,6 @@
 import { useEffect, type ReactNode } from 'react'
 import { X } from 'lucide-react'
-import { cn } from '../../lib/constants'
+import { cn } from '../../lib/cn'
 
 export interface ModalProps {
   open: boolean

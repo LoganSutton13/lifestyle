@@ -5,6 +5,7 @@ import { Card } from '../../components/ui/Card'
 import { Input } from '../../components/ui/Input'
 import { Modal } from '../../components/ui/Modal'
 import { Spinner } from '../../components/ui/Spinner'
+import { Textarea } from '../../components/ui/Textarea'
 import { useToast } from '../../components/ui/Toast'
 import { getTodayDateString } from '../../lib/date'
 import { getErrorMessage } from '../../lib/errors'
@@ -102,15 +103,12 @@ export function CoachTasksPanel({ clientId }: { clientId: string }) {
       <Card className="space-y-3">
         <h3 className="font-semibold text-text">Assign activity</h3>
         <Input label="Title" value={title} onChange={(e) => setTitle(e.target.value)} />
-        <label className="flex flex-col gap-1.5 text-sm font-medium text-text">
-          Description (optional)
-          <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            rows={2}
-            className="rounded-xl border border-border px-3 py-2.5 font-normal"
-          />
-        </label>
+        <Textarea
+          label="Description (optional)"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          rows={2}
+        />
         <Input
           label="Active from"
           type="date"
@@ -171,15 +169,12 @@ export function CoachTasksPanel({ clientId }: { clientId: string }) {
       >
         <div className="flex flex-col gap-4">
           <Input label="Title" value={editTitle} onChange={(e) => setEditTitle(e.target.value)} />
-          <label className="flex flex-col gap-1.5 text-sm font-medium text-text">
-            Description (optional)
-            <textarea
-              value={editDescription}
-              onChange={(e) => setEditDescription(e.target.value)}
-              rows={2}
-              className="rounded-xl border border-border px-3 py-2.5 font-normal"
-            />
-          </label>
+          <Textarea
+            label="Description (optional)"
+            value={editDescription}
+            onChange={(e) => setEditDescription(e.target.value)}
+            rows={2}
+          />
           <Input
             label="Active from"
             type="date"

@@ -5,6 +5,7 @@ import { z } from 'zod'
 import { Button } from '../../components/ui/Button'
 import { Card } from '../../components/ui/Card'
 import { Input } from '../../components/ui/Input'
+import { PageTitle } from '../../components/ui/PageTitle'
 import { getErrorMessage } from '../../lib/errors'
 import { useRegister, useRegisterDefaults } from './hooks'
 
@@ -41,7 +42,7 @@ export function RegisterPage() {
   return (
     <div className="mx-auto flex min-h-screen max-w-client flex-col justify-center px-4 py-8">
       <div className="mb-8 text-center">
-        <h1 className="text-3xl font-bold text-text">Create account</h1>
+        <PageTitle size="lg">Create account</PageTitle>
         <p className="mt-2 text-textMuted">Join as a client to track your fitness journey</p>
       </div>
 
