@@ -29,7 +29,7 @@ export function LoginPage() {
   return (
     <div className="mx-auto flex min-h-screen max-w-client flex-col justify-center px-4 py-8">
       <div className="mb-8 text-center">
-        <PageTitle size="lg">Lifestyle</PageTitle>
+        <PageTitle size="lg">Lifestyle Dev</PageTitle>
         <p className="mt-2 text-textMuted">Sign in to your account</p>
       </div>
 
