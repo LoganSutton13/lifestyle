@@ -1,7 +1,7 @@
 ---
 title: "Workout and Exercise Tracking Extension — Exact Implementation Specification"
 status: "Implementation Contract"
-version: "1.0"
+version: "1.1"
 last_updated: "2026-07-12"
 application: "Fitness Mobile-First Coaching PWA"
 ---
