@@ -187,7 +187,7 @@ export function ActiveWorkoutPage() {
     setId: string,
     payload: UpdateSetPayload,
   ): Promise<WorkoutSet> => {
-    const updated = await workoutsApi.updateSet(sessionId, setId, payload)
+    const updated = await workoutsApi.updateSet(sessionId, sessionExerciseId, setId, payload)
     queryClient.setQueryData<WorkoutSession>(workoutKeys.detail(sessionId), (current) =>
       patchSession(current, (sessionValue) => replaceSet(sessionValue, sessionExerciseId, updated)),
     )
@@ -217,7 +217,7 @@ export function ActiveWorkoutPage() {
 
   const handleDeleteSet = async (exercise: SessionExercise, setId: string) => {
     try {
-      await workoutsApi.removeSet(sessionId, setId)
+      await workoutsApi.removeSet(sessionId, exercise.id, setId)
       queryClient.setQueryData<WorkoutSession>(workoutKeys.detail(sessionId), (current) =>
         patchSession(current, (sessionValue) =>
           replaceExercise(sessionValue, {

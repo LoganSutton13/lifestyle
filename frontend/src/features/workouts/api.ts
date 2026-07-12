@@ -114,19 +114,30 @@ export function addSet(
 
 export function updateSet(
   sessionId: string,
+  sessionExerciseId: string,
   setId: string,
   body: UpdateSetRequest,
 ): Promise<WorkoutSet> {
-  return apiRequest<WorkoutSet>(`/api/me/workouts/${sessionId}/sets/${setId}`, {
-    method: 'PATCH',
-    body,
-  })
+  return apiRequest<WorkoutSet>(
+    `/api/me/workouts/${sessionId}/exercises/${sessionExerciseId}/sets/${setId}`,
+    {
+      method: 'PATCH',
+      body,
+    },
+  )
 }
 
-export function removeSet(sessionId: string, setId: string): Promise<void> {
-  return apiRequest<void>(`/api/me/workouts/${sessionId}/sets/${setId}`, {
-    method: 'DELETE',
-  })
+export function removeSet(
+  sessionId: string,
+  sessionExerciseId: string,
+  setId: string,
+): Promise<void> {
+  return apiRequest<void>(
+    `/api/me/workouts/${sessionId}/exercises/${sessionExerciseId}/sets/${setId}`,
+    {
+      method: 'DELETE',
+    },
+  )
 }
 
 export function fetchAssignments(params: {
