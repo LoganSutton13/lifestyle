@@ -2,7 +2,18 @@ from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
 
 from app.api.error_handlers import register_error_handlers
-from app.api.routers import admin, auth, checklist, coach, me, meals, measurements
+from app.api.routers import (
+    admin,
+    auth,
+    checklist,
+    coach,
+    coach_workouts,
+    exercises,
+    me,
+    meals,
+    measurements,
+    workouts,
+)
 from app.core.cors import configure_cors
 
 app = FastAPI(title="Fitness Coaching API", version="1.0.0", default_response_class=ORJSONResponse)
@@ -15,7 +26,10 @@ app.include_router(me.router, prefix="/api/me", tags=["me"])
 app.include_router(meals.router, prefix="/api/me/meals", tags=["client meals"])
 app.include_router(measurements.router, prefix="/api/me", tags=["client measurements"])
 app.include_router(checklist.router, prefix="/api/me", tags=["client checklist"])
+app.include_router(exercises.router, prefix="/api/exercises", tags=["exercises"])
+app.include_router(workouts.router, prefix="/api/me", tags=["client workouts"])
 app.include_router(coach.router, prefix="/api/coach", tags=["coach"])
+app.include_router(coach_workouts.router, prefix="/api/coach", tags=["coach workouts"])
 app.include_router(admin.router, prefix="/api/admin", tags=["admin"])
 
 
