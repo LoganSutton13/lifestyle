@@ -57,7 +57,6 @@ describe('EndWorkoutSheet', () => {
       <EndWorkoutSheet
         open
         session={session}
-        elapsedSeconds={120}
         onClose={() => undefined}
         onConfirm={onConfirm}
       />,

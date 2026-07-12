@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { X } from 'lucide-react'
@@ -14,11 +14,17 @@ import { DiscardWorkoutDialog } from './DiscardWorkoutDialog'
 import { EndWorkoutSheet } from './EndWorkoutSheet'
 import { ExercisePage } from './ExercisePage'
 import { ADD_EXERCISE_PAGE_KEY, ExercisePager, type ExercisePagerHandle } from './ExercisePager'
-import { copySetValues, formatElapsed, sessionDisplayTitle, sortedExercises } from './helpers'
+import { copySetValues, sessionDisplayTitle, sortedExercises } from './helpers'
 import { workoutKeys } from './queryKeys'
 import { RestTimer } from './RestTimer'
 import type { SessionExercise, UpdateSetPayload, WorkoutSession, WorkoutSet } from './types'
-import { computeElapsedSeconds } from './utils'
+import { formatClock, useElapsedSeconds } from './utils'
+
+/** Owns the 1s tick so the rest of the active workout UI does not re-render every second. */
+function WorkoutElapsedLabel({ startedAt }: { startedAt: string }) {
+  const elapsedSeconds = useElapsedSeconds(startedAt)
+  return <p className="text-sm tabular-nums text-textMuted">{formatClock(elapsedSeconds)}</p>
+}
 
 function patchSession(
   session: WorkoutSession | undefined,
@@ -52,15 +58,9 @@ export function ActiveWorkoutPage() {
   const queryClient = useQueryClient()
   const { showToast } = useToast()
   const pagerRef = useRef<ExercisePagerHandle>(null)
-  const [nowMs, setNowMs] = useState(() => Date.now())
   const [endOpen, setEndOpen] = useState(false)
   const [discardOpen, setDiscardOpen] = useState(false)
   const [addingExerciseId, setAddingExerciseId] = useState<string | null>(null)
-
-  useEffect(() => {
-    const id = window.setInterval(() => setNowMs(Date.now()), 1000)
-    return () => window.clearInterval(id)
-  }, [])
 
   const query = useQuery({
     queryKey: workoutKeys.detail(sessionId),
@@ -92,9 +92,12 @@ export function ActiveWorkoutPage() {
     }
   }, [exerciseParam, exercises, session, setSearchParams])
 
-  const setActiveId = (id: string) => {
-    setSearchParams({ exercise: id }, { replace: true })
-  }
+  const setActiveId = useCallback(
+    (id: string) => {
+      setSearchParams({ exercise: id }, { replace: true })
+    },
+    [setSearchParams],
+  )
 
   const setSessionCache = (next: WorkoutSession) => {
     queryClient.setQueryData(workoutKeys.detail(sessionId), next)
@@ -176,7 +179,6 @@ export function ActiveWorkoutPage() {
   const existingExerciseIds = exercises.map((item) => item.exercise.id)
   const currentExercise = exercises.find((item) => item.id === activeId)
   const restDefault = currentExercise?.restSeconds ?? 90
-  const elapsedSeconds = computeElapsedSeconds(session.startedAt, nowMs)
 
   const handleSelectExercise = (exercise: Exercise) => {
     addExerciseMutation.mutate(exercise.id)
@@ -338,7 +340,7 @@ export function ActiveWorkoutPage() {
       <header className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-border bg-background px-4 py-3">
         <div className="min-w-0">
           <h1 className="truncate text-lg font-bold text-text">{sessionDisplayTitle(session)}</h1>
-          <p className="text-sm tabular-nums text-textMuted">{formatElapsed(session.startedAt, nowMs)}</p>
+          <WorkoutElapsedLabel startedAt={session.startedAt} />
         </div>
         <div className="flex shrink-0 items-center gap-2">
           <Button size="sm" variant="ghost" aria-label="Discard workout" onClick={() => setDiscardOpen(true)}>
@@ -364,7 +366,6 @@ export function ActiveWorkoutPage() {
       <EndWorkoutSheet
         open={endOpen}
         session={session}
-        elapsedSeconds={elapsedSeconds}
         submitting={completeMutation.isPending}
         onClose={() => setEndOpen(false)}
         onConfirm={(payload) => completeMutation.mutate(payload)}

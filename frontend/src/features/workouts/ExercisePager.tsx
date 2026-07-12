@@ -49,6 +49,7 @@ export const ExercisePager = forwardRef<ExercisePagerHandle, ExercisePagerProps>
     const containerRef = useRef<HTMLDivElement>(null)
     const pageRefs = useRef(new Map<string, HTMLDivElement>())
     const lastScrolledId = useRef<string | null>(null)
+    const pageIds = pages.map((page) => page.id).join('\0')
     const activeIndex = Math.max(
       0,
       pages.findIndex((page) => page.id === activeId),
@@ -127,7 +128,9 @@ export const ExercisePager = forwardRef<ExercisePagerHandle, ExercisePagerProps>
 
       pageRefs.current.forEach((el) => observer.observe(el))
       return () => observer.disconnect()
-    }, [pages, activeId, onActiveChange])
+      // Re-bind when the set of page ids changes, not when page content identity churns.
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [pageIds, activeId, onActiveChange])
 
     useEffect(() => {
       const onKeyDown = (event: KeyboardEvent) => {

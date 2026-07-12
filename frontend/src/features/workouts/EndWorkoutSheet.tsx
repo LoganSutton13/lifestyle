@@ -2,14 +2,19 @@ import { useState } from 'react'
 import { AlertTriangle } from 'lucide-react'
 import { Button } from '../../components/ui/Button'
 import { Modal } from '../../components/ui/Modal'
-import { countCompletedSets, countExercisesWithSets, countIncompleteSets, formatClock } from './utils'
+import {
+  countCompletedSets,
+  countExercisesWithSets,
+  countIncompleteSets,
+  formatClock,
+  useElapsedSeconds,
+} from './utils'
 import type { WorkoutSession } from './types'
 
 export interface EndWorkoutSheetProps {
   open: boolean
   onClose: () => void
   session: WorkoutSession
-  elapsedSeconds: number
   submitting?: boolean
   onConfirm: (payload: { discardIncompleteSets: boolean; notes?: string }) => void
 }
@@ -18,11 +23,11 @@ export function EndWorkoutSheet({
   open,
   onClose,
   session,
-  elapsedSeconds,
   submitting,
   onConfirm,
 }: EndWorkoutSheetProps) {
   const [notes, setNotes] = useState(session.notes)
+  const elapsedSeconds = useElapsedSeconds(open ? session.startedAt : null)
   const completedExercises = countExercisesWithSets(session.exercises)
   const completedSets = countCompletedSets(session.exercises)
   const incompleteSets = countIncompleteSets(session.exercises)
