@@ -13,6 +13,19 @@
   --color-danger: #ef4444;
   --color-success: #10b981;
   --color-warning: #f59e0b;
+  --max-width-client: 480px;
+  --max-width-dashboard: 1200px;
+  --spacing-touch: 44px;
+  --min-height-touch: 44px;
+  --min-width-touch: 44px;
+}
+
+:root {
+  /* Content height of BottomNav (tabs), excluding home-indicator inset. */
+  --bottom-nav-height: 4.5rem;
+  --safe-area-top: env(safe-area-inset-top, 0px);
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  --bottom-nav-offset: calc(var(--bottom-nav-height) + var(--safe-area-bottom));
 }
 
 html,
@@ -32,4 +45,16 @@ body {
 
 * {
   box-sizing: border-box;
+}
+
+@utility safe-top {
+  padding-top: var(--safe-area-top);
+}
+
+@utility safe-bottom {
+  padding-bottom: var(--safe-area-bottom);
+}
+
+@utility pb-nav {
+  padding-bottom: var(--bottom-nav-offset);
 }

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { Dumbbell, X } from 'lucide-react'
 import { Alert } from '../../components/ui/Alert'
@@ -72,29 +73,33 @@ export function ExercisePickerSheet({
     enabled: open,
   })
 
-  if (!open) {
+  if (!open || typeof document === 'undefined') {
     return null
   }
 
   const items = query.data?.pages.flatMap((page) => page.items) ?? []
   const existingSet = new Set(existingExerciseIds)
 
-  return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-background" role="dialog" aria-modal="true" aria-label="Browse exercises">
-      <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-3">
-        <h2 className="text-lg font-semibold text-text">Add Exercise</h2>
-        <button
-          ref={closeButtonRef}
-          type="button"
-          aria-label="Close exercise picker"
-          onClick={onClose}
-          className="flex min-h-touch min-w-touch items-center justify-center rounded-full text-textMuted hover:bg-surface"
-        >
-          <X className="h-5 w-5" />
-        </button>
-      </div>
-
-      <div className="border-b border-border px-4 py-3">
+  return createPortal(
+    <div
+      className="fixed inset-0 z-50 flex flex-col bg-background"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Browse exercises"
+    >
+      <div className="shrink-0 border-b border-border bg-background px-4 pb-3 pt-[calc(0.75rem+var(--safe-area-top))]">
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <h2 className="text-lg font-semibold text-text">Add Exercise</h2>
+          <button
+            ref={closeButtonRef}
+            type="button"
+            aria-label="Close exercise picker"
+            onClick={onClose}
+            className="flex min-h-touch min-w-touch items-center justify-center rounded-full text-textMuted hover:bg-surface"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
         <ExerciseSearchFilters
           query={queryInput}
           equipment={equipment}
@@ -105,12 +110,10 @@ export function ExercisePickerSheet({
         />
       </div>
 
-      <div className="flex-1 overflow-y-auto px-4 py-3">
+      <div className="min-h-0 flex-1 overflow-y-auto px-4 py-3 pb-[calc(0.75rem+var(--safe-area-bottom))]">
         {query.isLoading ? <Spinner label="Searching exercises..." /> : null}
 
-        {query.isError ? (
-          <Alert>{getErrorMessage(query.error)}</Alert>
-        ) : null}
+        {query.isError ? <Alert>{getErrorMessage(query.error)}</Alert> : null}
 
         {query.isSuccess && items.length === 0 ? (
           <EmptyState
@@ -140,7 +143,9 @@ export function ExercisePickerSheet({
                     <div className="flex flex-wrap items-center gap-2 text-xs text-textMuted">
                       <span>{exercise.equipment.displayName}</span>
                       <span aria-hidden="true">&middot;</span>
-                      <span>{exercise.primaryMuscles.map((m) => m.displayName).join(', ') || 'General'}</span>
+                      <span>
+                        {exercise.primaryMuscles.map((m) => m.displayName).join(', ') || 'General'}
+                      </span>
                       <span aria-hidden="true">&middot;</span>
                       <span>{trackingTypeLabel(exercise.trackingType)}</span>
                       {exercise.defaultUnilateral ? (
@@ -175,6 +180,7 @@ export function ExercisePickerSheet({
           </div>
         ) : null}
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }

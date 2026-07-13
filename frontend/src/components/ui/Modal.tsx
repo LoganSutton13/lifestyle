@@ -1,4 +1,5 @@
 import { useEffect, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
 import { X } from 'lucide-react'
 import { cn } from '../../lib/cn'
 
@@ -29,11 +30,11 @@ export function Modal({ open, onClose, title, children, className }: ModalProps)
     }
   }, [open, onClose])
 
-  if (!open) {
+  if (!open || typeof document === 'undefined') {
     return null
   }
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center">
       <button
         type="button"
@@ -46,7 +47,7 @@ export function Modal({ open, onClose, title, children, className }: ModalProps)
         aria-modal="true"
         aria-labelledby="modal-title"
         className={cn(
-          'relative z-10 max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-t-2xl bg-background p-5 shadow-xl sm:rounded-2xl',
+          'relative z-10 max-h-[min(90vh,100dvh)] w-full max-w-lg overflow-y-auto rounded-t-2xl bg-background p-5 pb-[calc(1.25rem+var(--safe-area-bottom))] shadow-xl sm:rounded-2xl sm:pb-5',
           className,
         )}
       >
@@ -65,6 +66,7 @@ export function Modal({ open, onClose, title, children, className }: ModalProps)
         </div>
         {children}
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }

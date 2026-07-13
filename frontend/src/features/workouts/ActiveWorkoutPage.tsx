@@ -336,8 +336,8 @@ export function ActiveWorkoutPage() {
   ]
 
   return (
-    <div className="fixed inset-x-0 bottom-[calc(4.5rem+env(safe-area-inset-bottom))] top-0 z-30 flex flex-col bg-background sm:static sm:inset-auto sm:z-auto sm:min-h-[70vh]">
-      <header className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-border bg-background px-4 py-3">
+    <div className="fixed inset-x-0 bottom-[var(--bottom-nav-offset)] top-0 z-30 flex flex-col bg-background sm:static sm:inset-auto sm:z-auto sm:min-h-[70vh]">
+      <header className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-border bg-background px-4 pb-3 pt-[calc(0.75rem+var(--safe-area-top))] sm:pt-3">
         <div className="min-w-0">
           <h1 className="truncate text-lg font-bold text-text">{sessionDisplayTitle(session)}</h1>
           <WorkoutElapsedLabel startedAt={session.startedAt} />
